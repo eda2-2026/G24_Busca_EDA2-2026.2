@@ -139,4 +139,111 @@ public class PrefixContainerTest
         Assert.Single(result);
         Assert.Equal("foo.bar", result["bar"]);
     }
+
+    [Fact]
+    public void GetKeysFromPrefix_FindsPrefixAtBeginningOfSortedCollection()
+    {
+        var keys = new[]
+        {
+            "foo.first",
+            "foo.second",
+            "zoo.value"
+        };
+
+        var result = new PrefixContainer(keys).GetKeysFromPrefix("foo");
+
+        Assert.Equal(2, result.Count);
+        Assert.Equal("foo.first", result["first"]);
+        Assert.Equal("foo.second", result["second"]);
+    }
+
+
+    [Fact]
+    public void GetKeysFromPrefix_FindsPrefixInMiddleOfSortedCollection()
+    {
+        var keys = new[]
+        {
+            "aaa.value",
+            "foo.first",
+            "foo.second",
+            "zzz.value"
+        };
+
+        var result = new PrefixContainer(keys).GetKeysFromPrefix("foo");
+
+        Assert.Equal(2, result.Count);
+        Assert.Equal("foo.first", result["first"]);
+        Assert.Equal("foo.second", result["second"]);
+    }
+
+
+    [Fact]
+    public void GetKeysFromPrefix_FindsPrefixAtEndOfSortedCollection()
+    {
+        var keys = new[]
+        {
+            "aaa.value",
+            "bbb.value",
+            "foo.last"
+        };
+
+        var result = new PrefixContainer(keys).GetKeysFromPrefix("foo");
+
+        Assert.Single(result);
+        Assert.Equal("foo.last", result["last"]);
+    }
+
+
+    [Fact]
+    public void GetKeysFromPrefix_ReturnsOnlyContinuousPrefixRange()
+    {
+        var keys = new[]
+        {
+            "foo.a",
+            "foo.b",
+            "foo.c",
+            "food.value",
+            "foobar.value"
+        };
+
+        var result = new PrefixContainer(keys).GetKeysFromPrefix("foo");
+
+        Assert.Equal(3, result.Count);
+        Assert.Equal("foo.a", result["a"]);
+        Assert.Equal("foo.b", result["b"]);
+        Assert.Equal("foo.c", result["c"]);
+    }
+
+    [Fact]
+    public void GetKeysFromPrefix_ReturnsEmptyWhenPrefixIsBetweenSortedValues()
+    {
+        var keys = new[]
+        {
+            "aaa.value",
+            "ccc.value"
+        };
+
+        var result = new PrefixContainer(keys).GetKeysFromPrefix("bbb");
+
+        Assert.Empty(result);
+    }
+
+
+    [Fact]
+    public void GetKeysFromPrefix_MaintainsBehaviorWithDifferentCasingEntries()
+    {
+        var keys = new[]
+        {
+            "foo.Bar",
+            "Foo.baz",
+            "FOO.test"
+        };
+
+        var result = new PrefixContainer(keys).GetKeysFromPrefix("foo");
+
+        Assert.Equal(3, result.Count);
+        Assert.Contains("foo.Bar", result.Values);
+        Assert.Contains("Foo.baz", result.Values);
+        Assert.Contains("FOO.test", result.Values);
+    }
 }
