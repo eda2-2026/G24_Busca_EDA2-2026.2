@@ -56,24 +56,46 @@ public class PrefixContainer
     {
         var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-        foreach (var entry in _originalValues)
+        if (_sortedValues.Length == 0)
         {
-            if (entry != null)
-            {
-                if (entry.Length == prefix.Length)
-                {
-                    continue;
-                }
+            return result;
+        }
 
-                if (prefix.Length == 0)
+        if (prefix.Length == 0)
+        {
+            foreach (var entry in _sortedValues)
+            {
+                if (entry != null)
                 {
                     GetKeyFromEmptyPrefix(entry, result);
                 }
-                else if (entry.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-                {
-                    GetKeyFromNonEmptyPrefix(prefix, entry, result);
-                }
             }
+
+            return result;
+        }
+
+        var start = FindFirstCandidate(prefix);
+
+        for (var i = start; i < _sortedValues.Length; i++)
+        {
+            var entry = _sortedValues[i];
+
+            if (entry == null)
+            {
+                continue;
+            }
+
+            if (!entry.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            {
+                break;
+            }
+
+            if (entry.Length == prefix.Length)
+            {
+                continue;
+            }
+
+            GetKeyFromNonEmptyPrefix(prefix, entry, result);
         }
 
         return result;
@@ -198,7 +220,31 @@ public class PrefixContainer
 
         return ~start;
     }
+    private int FindFirstCandidate(string prefix)
+    {
+        var start = 0;
+        var end = _sortedValues.Length;
 
+        while (start < end)
+        {
+            var pivot = start + ((end - start) / 2);
+
+            var compare = StringComparer.OrdinalIgnoreCase.Compare(
+                _sortedValues[pivot],
+                prefix);
+
+            if (compare < 0)
+            {
+                start = pivot + 1;
+            }
+            else
+            {
+                end = pivot;
+            }
+        }
+
+        return start;
+    }
     private int LinearSearch(string prefix, int start, int end)
     {
         for (; start <= end; start++)
