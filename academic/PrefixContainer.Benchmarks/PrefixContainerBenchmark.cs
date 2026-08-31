@@ -1,12 +1,12 @@
 using BenchmarkDotNet.Attributes;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+using ModelBindingPrefixContainer = Microsoft.AspNetCore.Mvc.ModelBinding.PrefixContainer;
 
 namespace PrefixContainer.Benchmarks;
 
 [MemoryDiagnoser]
 public class PrefixContainerBenchmark
 {
-    private PrefixContainer _container = null!;
+    private ModelBindingPrefixContainer _container = null!;
     private string _prefix = null!;
 
     [Params(100, 1_000, 10_000)]
@@ -49,7 +49,7 @@ public class PrefixContainerBenchmark
                 throw new InvalidOperationException($"Unknown scenario: {Scenario}");
         }
 
-        _container = new PrefixContainer(keys);
+        _container = new ModelBindingPrefixContainer(keys);
     }
 
     [Benchmark]
