@@ -1,4 +1,8 @@
-# G24_Busca_EDA2-2026.2
+# Vídeo da apresentação
+
+[Link do vídeo no YouTube](https://www.youtube.com/watch?v=e9i8PilDifE)
+
+## G24_Busca_EDA2-2026.2
 
 Repositório acadêmico para estudar e implementar a otimização proposta em [`dotnet/aspnetcore#68343`](https://github.com/dotnet/aspnetcore/issues/68343) e realizar o banchmark após as mudanças.
 
